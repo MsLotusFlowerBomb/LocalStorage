@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="Ass5.ProfilePage"
+             Title="Profile">
+
+    <ScrollView>
+        <VerticalStackLayout Padding="20" Spacing="12">
+
+            <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto" ColumnSpacing="12">
+                <Frame WidthRequest="80" HeightRequest="80" CornerRadius="40" Padding="0" HasShadow="False" BackgroundColor="#EEE">
+                    <Image x:Name="ProfileImage" Aspect="AspectFill" />
+                </Frame>
+
+                <VerticalStackLayout Grid.Column="1" Spacing="6" VerticalOptions="Center">
+                    <Label Text="Profile" FontSize="22" FontAttributes="Bold" />
+                    <HorizontalStackLayout Spacing="10">
+                        <Button Text="Choose Photo" Clicked="OnChoosePhotoClicked" />
+                        <Button Text="Clear" Clicked="OnClearPhotoClicked" />
+                    </HorizontalStackLayout>
+                </VerticalStackLayout>
+            </Grid>
+
+            <Label Text="Name" />
+            <Entry x:Name="NameEntry" Placeholder="Name" />
+
+            <Label Text="Surname" />
+            <Entry x:Name="SurnameEntry" Placeholder="Surname" />
+
+            <Label Text="Email Address" />
+            <Entry x:Name="EmailEntry" Placeholder="Email" Keyboard="Email" />
+
+            <Label Text="Bio" />
+            <Editor x:Name="BioEditor" Placeholder="Tell us about yourself" AutoSize="TextChanges" HeightRequest="120" />
+
+            <Button x:Name="SaveButton" Text="Save" Clicked="OnSaveClicked" />
+
+            <Label x:Name="StatusLabel" FontSize="12" TextColor="Gray" />
+        </VerticalStackLayout>
+    </ScrollView>
+
+</ContentPage>
