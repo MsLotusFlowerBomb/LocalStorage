@@ -1,5 +1,7 @@
 namespace Ass5.Models;
 
+
+//This class will be used to store and retrieve the profile information
 public sealed class Profile
 {
     public string? Name { get; set; }

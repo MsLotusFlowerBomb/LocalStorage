@@ -3,6 +3,7 @@ using Ass5.Models;
 
 namespace Ass5.Services;
 
+// Service for loading and saving the profile data, including the profile photo. 
 public sealed class ProfileStorage
 {
     private const string ProfileFileName = "profile.json";
@@ -11,6 +12,7 @@ public sealed class ProfileStorage
     public static string StorageDirectory => FileSystem.AppDataDirectory;
     public static string ProfileFilePath => Path.Combine(StorageDirectory, ProfileFileName);
 
+    //Loads the profile data from a JSON file. If the file does not exist or is empty, it returns a new Profile.
     public async Task<Profile> LoadAsync(CancellationToken cancellationToken = default)
     {
         if (!File.Exists(ProfileFilePath))
@@ -23,6 +25,7 @@ public sealed class ProfileStorage
         return JsonSerializer.Deserialize<Profile>(json) ?? new Profile();
     }
 
+    // Saves the profile data to a JSON file. It creates the storage directory if it does not exist.
     public async Task SaveAsync(Profile profile, CancellationToken cancellationToken = default)
     {
         var json = JsonSerializer.Serialize(profile, new JsonSerializerOptions
@@ -34,6 +37,7 @@ public sealed class ProfileStorage
         await File.WriteAllTextAsync(ProfileFilePath, json, cancellationToken).ConfigureAwait(false);
     }
 
+    // Saves the profile photo to the storage directory. It generates a file name based on the original file name and saves the photo.
     public async Task<string?> SavePhotoAsync(FileResult photo, CancellationToken cancellationToken = default)
     {
         var ext = Path.GetExtension(photo.FileName);
@@ -50,6 +54,7 @@ public sealed class ProfileStorage
         return fileName;
     }
 
+    //retrieves the full path to the profile photo if it exists. 
     public string? GetPhotoPath(string? photoFileName)
     {
         if (string.IsNullOrWhiteSpace(photoFileName))
