@@ -19,4 +19,10 @@ public partial class ProfilePage : ContentPage
         base.OnAppearing();
         await _viewModel.LoadAsync();
     }
+
+    private async void OnChangePhotoClicked(object? sender, EventArgs e)
+    {
+        _viewModel.StatusMessage = "Photo upload is not connected to Supabase profile storage in this assignment build.";
+        await DisplayAlert("Photo", "Photo upload is not connected to Supabase profile storage in this assignment build.", "OK");
+    }
 }
