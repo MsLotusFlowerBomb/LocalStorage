@@ -1,4 +1,4 @@
-# Ass5 (LocalStorage)
+# MAUI Shopping App (Supabase)
 
 .NET MAUI shopping app using MVVM and Supabase (PostgREST) for profile and shopping cart storage.
 
@@ -17,7 +17,7 @@ Run this SQL in Supabase SQL editor:
 
 ```sql
 create table if not exists profiles (
-  id integer primary key,
+  id integer generated always as identity primary key,
   name text,
   surname text,
   email_address text,

@@ -30,7 +30,7 @@ public sealed class ProfileViewModel : BaseViewModel
             if (_profile.Name == value)
                 return;
             _profile.Name = value;
-            OnProfileChanged();
+            OnPropertyChanged();
         }
     }
 
@@ -42,7 +42,7 @@ public sealed class ProfileViewModel : BaseViewModel
             if (_profile.Surname == value)
                 return;
             _profile.Surname = value;
-            OnProfileChanged();
+            OnPropertyChanged();
         }
     }
 
@@ -54,7 +54,7 @@ public sealed class ProfileViewModel : BaseViewModel
             if (_profile.EmailAddress == value)
                 return;
             _profile.EmailAddress = value;
-            OnProfileChanged();
+            OnPropertyChanged();
         }
     }
 
@@ -66,7 +66,7 @@ public sealed class ProfileViewModel : BaseViewModel
             if (_profile.Bio == value)
                 return;
             _profile.Bio = value;
-            OnProfileChanged();
+            OnPropertyChanged();
         }
     }
 
@@ -106,6 +106,7 @@ public sealed class ProfileViewModel : BaseViewModel
             IsBusy = true;
             StatusMessage = "Saving profile...";
             await _dataService.SaveProfileAsync(_profile);
+            OnPropertyChanged(nameof(ProfileId));
             StatusMessage = "Profile saved.";
         }
         catch (Exception ex)
@@ -125,28 +126,39 @@ public sealed class ProfileViewModel : BaseViewModel
         if (IsBusy)
             return;
 
-        var currentProfileId = ProfileId;
-        _profile = await _dataService.GetOrCreateProfileAsync();
-        _profile.Id = _profile.Id == 0 ? currentProfileId : _profile.Id;
-        _profile.Name = string.Empty;
-        _profile.Surname = string.Empty;
-        _profile.EmailAddress = string.Empty;
-        _profile.Bio = string.Empty;
-        RaiseAllProperties();
+        try
+        {
+            IsBusy = true;
+            StatusMessage = "Clearing profile...";
+
+            _profile = await _dataService.GetOrCreateProfileAsync();
+            _profile.Name = string.Empty;
+            _profile.Surname = string.Empty;
+            _profile.EmailAddress = string.Empty;
+            _profile.Bio = string.Empty;
+            RaiseAllProperties();
+        }
+        catch (Exception ex)
+        {
+            StatusMessage = $"Clear failed: {ex.Message}";
+            return;
+        }
+        finally
+        {
+            IsBusy = false;
+            ((Command)SaveCommand).ChangeCanExecute();
+            ((Command)ClearCommand).ChangeCanExecute();
+        }
+
         await SaveAsync();
     }
 
     private void RaiseAllProperties()
     {
-        OnProfileChanged();
-        OnPropertyChanged(nameof(ProfileId));
-    }
-
-    private void OnProfileChanged()
-    {
         OnPropertyChanged(nameof(Name));
         OnPropertyChanged(nameof(Surname));
         OnPropertyChanged(nameof(EmailAddress));
         OnPropertyChanged(nameof(Bio));
+        OnPropertyChanged(nameof(ProfileId));
     }
 }

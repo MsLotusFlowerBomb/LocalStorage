@@ -69,13 +69,11 @@ public sealed class SupabaseShoppingDataService : IShoppingDataService
         if (!_options.IsConfigured)
             return _localProfile;
 
-        var profiles = await GetAsync<List<Profile>>($"{ProfilesTable}?select=*&id=eq.1", cancellationToken) ?? [];
+        var profiles = await GetAsync<List<Profile>>($"{ProfilesTable}?select=*&order=id.asc&limit=1", cancellationToken) ?? [];
         if (profiles.Count > 0)
             return profiles[0];
 
-        var profile = new Profile { Id = 1 };
-        await SaveProfileAsync(profile, cancellationToken);
-        return profile;
+        return await CreateProfileAsync(new Profile(), cancellationToken);
     }
 
     public async Task SaveProfileAsync(Profile profile, CancellationToken cancellationToken = default)
@@ -89,15 +87,27 @@ public sealed class SupabaseShoppingDataService : IShoppingDataService
             return;
         }
 
-        profile.Id = profile.Id <= 0 ? 1 : profile.Id;
-        var payload = JsonSerializer.Serialize(profile, JsonOptions);
+        if (profile.Id <= 0)
+        {
+            var created = await CreateProfileAsync(profile, cancellationToken);
+            profile.Id = created.Id;
+            return;
+        }
+
+        var payload = JsonSerializer.Serialize(new
+        {
+            name = profile.Name,
+            surname = profile.Surname,
+            email_address = profile.EmailAddress,
+            bio = profile.Bio
+        }, JsonOptions);
         using var content = new StringContent(payload, Encoding.UTF8, "application/json");
-        using var request = new HttpRequestMessage(HttpMethod.Post, ProfilesTable)
+        using var request = new HttpRequestMessage(HttpMethod.Patch, $"{ProfilesTable}?id=eq.{profile.Id}")
         {
             Content = content
         };
 
-        request.Headers.Add("Prefer", "resolution=merge-duplicates,return=representation");
+        request.Headers.Add("Prefer", "return=representation");
 
         using var response = await _httpClient.SendAsync(request, cancellationToken);
         response.EnsureSuccessStatusCode();
@@ -242,6 +252,31 @@ public sealed class SupabaseShoppingDataService : IShoppingDataService
         using var request = new HttpRequestMessage(HttpMethod.Delete, $"{CartTable}?profile_id=eq.{profileId}&shopping_item_id=eq.{shoppingItemId}");
         using var response = await _httpClient.SendAsync(request, cancellationToken);
         response.EnsureSuccessStatusCode();
+    }
+
+    private async Task<Profile> CreateProfileAsync(Profile profile, CancellationToken cancellationToken)
+    {
+        var payload = JsonSerializer.Serialize(new
+        {
+            name = profile.Name,
+            surname = profile.Surname,
+            email_address = profile.EmailAddress,
+            bio = profile.Bio
+        }, JsonOptions);
+
+        using var content = new StringContent(payload, Encoding.UTF8, "application/json");
+        using var request = new HttpRequestMessage(HttpMethod.Post, ProfilesTable)
+        {
+            Content = content
+        };
+        request.Headers.Add("Prefer", "return=representation");
+
+        using var response = await _httpClient.SendAsync(request, cancellationToken);
+        response.EnsureSuccessStatusCode();
+
+        await using var stream = await response.Content.ReadAsStreamAsync(cancellationToken);
+        var created = await JsonSerializer.DeserializeAsync<List<Profile>>(stream, JsonOptions, cancellationToken) ?? [];
+        return created.FirstOrDefault() ?? new Profile();
     }
 
     private async Task<T?> GetAsync<T>(string path, CancellationToken cancellationToken)
