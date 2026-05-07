@@ -7,7 +7,6 @@
 
     <Grid>
         <Grid.Background>
-            <!-- Pastel Gradient Background-->
             <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
                 <GradientStop Color="#FAD5E5" Offset="0" />
                 <GradientStop Color="#F3C7F0" Offset="0.35" />
@@ -16,7 +15,6 @@
             </LinearGradientBrush>
         </Grid.Background>
 
-        <!--Creating the curves at the top of the page   -->
         <Path Opacity="0.35"
               HorizontalOptions="Fill"
               VerticalOptions="Start"
@@ -25,7 +23,6 @@
 
         <ScrollView>
             <VerticalStackLayout Padding="20" Spacing="18">
-            <!--Page title and subtitle-->
                 <VerticalStackLayout Spacing="4" Padding="0,24,0,0">
                     <Label Text="Welcome" FontSize="34" FontAttributes="Bold" TextColor="#1B1B1F" HorizontalTextAlignment="Center" />
                     <Label Text="Enter your profile details" FontSize="12" TextColor="#4B4B56" HorizontalTextAlignment="Center" />
@@ -33,30 +30,26 @@
 
                 <Frame CornerRadius="28" Padding="22" HasShadow="True" BackgroundColor="White" BorderColor="#1A000000" Opacity="90">
                     <VerticalStackLayout Spacing="14">
-                        
 
                         <VerticalStackLayout Spacing="8" HorizontalOptions="Center">
                             <Grid WidthRequest="150" HeightRequest="150" HorizontalOptions="Center" VerticalOptions="Center">
-                                <!--Profile Picture-->
                                 <Frame CornerRadius="30" Padding="0" HasShadow="False" BackgroundColor="#F2F2F7" BorderColor="#E6E6EF">
-                                    <Image x:Name="ProfileImage" Aspect="AspectFill" />
+                                    <Image x:Name="ProfileImage" Source="picc.png" Aspect="AspectFill" />
                                 </Frame>
-                                
-                                <!--Upload picture button-->
+
                                 <ImageButton Source="camc.png"
-                                        WidthRequest="60"
-                                        HeightRequest="60"
-                                        CornerRadius="30"
-                                        HorizontalOptions="End"
-                                        VerticalOptions="End"
-                                        Clicked="OnChangePhotoClicked" />
+                                             WidthRequest="60"
+                                             HeightRequest="60"
+                                             CornerRadius="30"
+                                             HorizontalOptions="End"
+                                             VerticalOptions="End"
+                                             Clicked="OnChangePhotoClicked" />
                             </Grid>
 
                             <Label Text="Profile" FontSize="18" FontAttributes="Bold" TextColor="#1B1B1F" HorizontalTextAlignment="Center" />
                             <Label Text="Tap the camera to change photo" FontSize="12" TextColor="#6B6B78" HorizontalTextAlignment="Center" />
                         </VerticalStackLayout>
 
-                        <!-- Clear button-->
                         <Border StrokeThickness="0" StrokeShape="RoundRectangle 16">
                             <Border.Background>
                                 <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
@@ -68,31 +61,29 @@
                                     BackgroundColor="Transparent"
                                     TextColor="White"
                                     CornerRadius="16"
-                                    Clicked="OnClearClicked" />
+                                    Command="{Binding ClearCommand}" />
                         </Border>
-                        
-                        <!--Text Fields-->
 
                         <Label Text="Name" TextColor="#6B6B78" FontSize="12" />
                         <Border Stroke="#E6E6EF" StrokeThickness="1" BackgroundColor="#FAFAFC" StrokeShape="RoundRectangle 14" Padding="12,6">
-                            <Entry x:Name="NameEntry" Placeholder="Enter name" TextColor="#1B1B1F" PlaceholderColor="#8C8C98" BackgroundColor="Transparent"  ClearButtonVisibility="WhileEditing" />
+                            <Entry Placeholder="Enter name" Text="{Binding Name}" TextColor="#1B1B1F" PlaceholderColor="#8C8C98" BackgroundColor="Transparent" ClearButtonVisibility="WhileEditing" />
                         </Border>
 
                         <Label Text="Surname" TextColor="#6B6B78" FontSize="12" />
                         <Border Stroke="#E6E6EF" StrokeThickness="1" BackgroundColor="#FAFAFC" StrokeShape="RoundRectangle 14" Padding="12,6">
-                            <Entry x:Name="SurnameEntry" Placeholder="Enter surname" TextColor="#1B1B1F" PlaceholderColor="#8C8C98" BackgroundColor="Transparent" ClearButtonVisibility="WhileEditing" />
+                            <Entry Placeholder="Enter surname" Text="{Binding Surname}" TextColor="#1B1B1F" PlaceholderColor="#8C8C98" BackgroundColor="Transparent" ClearButtonVisibility="WhileEditing" />
                         </Border>
 
                         <Label Text="Email Address" TextColor="#6B6B78" FontSize="12" />
                         <Border Stroke="#E6E6EF" StrokeThickness="1" BackgroundColor="#FAFAFC" StrokeShape="RoundRectangle 14" Padding="12,6">
-                            <Entry x:Name="EmailEntry" Placeholder="Enter email" Keyboard="Email" TextColor="#1B1B1F" PlaceholderColor="#8C8C98" BackgroundColor="Transparent" ClearButtonVisibility="WhileEditing" />
+                            <Entry Placeholder="Enter email" Text="{Binding EmailAddress}" Keyboard="Email" TextColor="#1B1B1F" PlaceholderColor="#8C8C98" BackgroundColor="Transparent" ClearButtonVisibility="WhileEditing" />
                         </Border>
 
                         <Label Text="Bio" TextColor="#6B6B78" FontSize="12" />
                         <Border Stroke="#E6E6EF" StrokeThickness="1" BackgroundColor="#FAFAFC" StrokeShape="RoundRectangle 14" Padding="12,10">
-                            <Editor x:Name="BioEditor" Placeholder="Tell us about yourself" TextColor="#1B1B1F" PlaceholderColor="#8C8C98" BackgroundColor="Transparent" AutoSize="TextChanges" HeightRequest="120" />
+                            <Editor Placeholder="Tell us about yourself" Text="{Binding Bio}" TextColor="#1B1B1F" PlaceholderColor="#8C8C98" BackgroundColor="Transparent" AutoSize="TextChanges" HeightRequest="120" />
                         </Border>
-                        <!--Gradient for button setting-->
+
                         <Border StrokeThickness="0" StrokeShape="RoundRectangle 16">
                             <Border.Background>
                                 <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
@@ -100,18 +91,16 @@
                                     <GradientStop Color="#C8A6F7" Offset="1" />
                                 </LinearGradientBrush>
                             </Border.Background>
-                            
-                            <!--Save button-->
-                            
+
                             <Button x:Name="SaveButton"
                                     Text="Save"
                                     BackgroundColor="Transparent"
                                     TextColor="White"
                                     CornerRadius="16"
-                                    Clicked="OnSaveClicked" />
+                                    Command="{Binding SaveCommand}" />
                         </Border>
 
-                        <Label x:Name="StatusLabel" FontSize="12" TextColor="#6B6B78" LineBreakMode="WordWrap" />
+                        <Label x:Name="StatusLabel" Text="{Binding StatusMessage}" FontSize="12" TextColor="#6B6B78" LineBreakMode="WordWrap" />
                     </VerticalStackLayout>
                 </Frame>
 

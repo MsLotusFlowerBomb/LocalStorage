@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="Ass5.ShoppingListPage"
+             x:Name="ShoppingListRoot"
+             Title="Shopping Items">
+    <Grid RowDefinitions="Auto,Auto,*" Padding="16">
+        <Label Grid.Row="0" Text="Shopping List" FontSize="28" FontAttributes="Bold" />
+
+        <Button Grid.Row="1"
+                Margin="0,10,0,10"
+                Text="View Shopping Cart"
+                Command="{Binding ViewCartCommand}" />
+
+        <CollectionView Grid.Row="2" ItemsSource="{Binding Items}">
+            <CollectionView.ItemTemplate>
+                <DataTemplate>
+                    <Frame Margin="0,0,0,10" Padding="10">
+                        <Grid RowDefinitions="Auto,Auto,Auto" ColumnDefinitions="*,Auto">
+                            <Label Grid.Row="0" Grid.Column="0" Text="{Binding Name}" FontAttributes="Bold" FontSize="18" />
+                            <Label Grid.Row="1" Grid.Column="0" Text="{Binding Description}" FontSize="12" />
+                            <Label Grid.Row="2" Grid.Column="0" Text="{Binding StockQuantity, StringFormat='Stock: {0}'}" FontSize="12" />
+                            <VerticalStackLayout Grid.Row="0" Grid.RowSpan="3" Grid.Column="1" Spacing="6">
+                                <Label Text="{Binding Price, StringFormat='${0:F2}'}" HorizontalTextAlignment="End" />
+                                <Button Text="Add to Cart"
+                                        Command="{Binding Source={x:Reference ShoppingListRoot}, Path=BindingContext.AddToCartCommand}"
+                                        CommandParameter="{Binding .}" />
+                            </VerticalStackLayout>
+                        </Grid>
+                    </Frame>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+
+        <Label Grid.Row="2"
+               VerticalOptions="End"
+               Text="{Binding StatusMessage}"
+               FontSize="12"
+               Margin="0,0,0,4" />
+    </Grid>
+</ContentPage>
