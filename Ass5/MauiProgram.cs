@@ -21,8 +21,7 @@ public static class MauiProgram
         var supabaseOptions = SupabaseOptions.Load();
 
         builder.Services.AddSingleton(supabaseOptions);
-        builder.Services.AddSingleton(new HttpClient());
-        builder.Services.AddSingleton<IShoppingDataService, SupabaseShoppingDataService>();
+        builder.Services.AddHttpClient<IShoppingDataService, SupabaseShoppingDataService>();
 
         builder.Services.AddSingleton<ProfileViewModel>();
         builder.Services.AddSingleton<ShoppingListViewModel>();

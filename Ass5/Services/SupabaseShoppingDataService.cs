@@ -89,7 +89,7 @@ public sealed class SupabaseShoppingDataService : IShoppingDataService
             return;
         }
 
-        profile.Id = 1;
+        profile.Id = profile.Id <= 0 ? 1 : profile.Id;
         var payload = JsonSerializer.Serialize(profile, JsonOptions);
         using var content = new StringContent(payload, Encoding.UTF8, "application/json");
         using var request = new HttpRequestMessage(HttpMethod.Post, ProfilesTable)

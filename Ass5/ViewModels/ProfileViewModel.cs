@@ -125,7 +125,13 @@ public sealed class ProfileViewModel : BaseViewModel
         if (IsBusy)
             return;
 
-        _profile = new Profile { Id = ProfileId };
+        var currentProfileId = ProfileId;
+        _profile = await _dataService.GetOrCreateProfileAsync();
+        _profile.Id = _profile.Id == 0 ? currentProfileId : _profile.Id;
+        _profile.Name = string.Empty;
+        _profile.Surname = string.Empty;
+        _profile.EmailAddress = string.Empty;
+        _profile.Bio = string.Empty;
         RaiseAllProperties();
         await SaveAsync();
     }
