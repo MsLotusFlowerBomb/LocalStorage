@@ -1,97 +1,64 @@
 # Ass5 (LocalStorage)
 
-.NET MAUI app that lets a user create and store a simple profile (name, surname, email, bio) and an optional profile photo using local app storage.
+.NET MAUI shopping app using MVVM and Supabase (PostgREST) for profile and shopping cart storage.
 
 ## Features
 
-- View/edit profile fields: **Name**, **Surname**, **Email Address**, **Bio**
-- Pick a profile photo from the device or capture a new one (where supported)
-- Save/load profile data to local storage as JSON
-- Save a profile photo to local storage
+- Shopping List landing page with seeded fictitious shopping items
+- Add item to shopping cart with stock-limit protection
+- Shopping Cart page with remove-item support
+- Profile page that preloads saved data and saves updates
+- Cart items linked to the profile (`profile_id`)
+- Fallback in-memory data mode when Supabase environment variables are not configured
 
-## Tech stack
+## Database design (Supabase)
 
-- .NET **9**
-- **.NET MAUI** (single project)
-- `System.Text.Json` for serialization
-- `MediaPicker` (MAUI Essentials) for photo capture/pick
+Run this SQL in Supabase SQL editor:
+
+```sql
+create table if not exists profiles (
+  id integer primary key,
+  name text,
+  surname text,
+  email_address text,
+  bio text
+);
+
+create table if not exists shopping_items (
+  id integer generated always as identity primary key,
+  name text not null,
+  description text not null,
+  price numeric(10,2) not null check (price >= 0),
+  stock_quantity integer not null check (stock_quantity >= 0)
+);
+
+create table if not exists shopping_cart_items (
+  id integer generated always as identity primary key,
+  profile_id integer not null references profiles(id) on delete cascade,
+  shopping_item_id integer not null references shopping_items(id) on delete cascade,
+  quantity integer not null check (quantity > 0),
+  unique(profile_id, shopping_item_id)
+);
+```
+
+## Supabase configuration
+
+Set environment variables before running:
+
+- `SUPABASE_URL`
+- `SUPABASE_ANON_KEY`
+
+If these are not set, the app runs with local fallback data.
 
 ## Project structure
 
-- `Ass5\AppShell.xaml` — Shell navigation
-- `Ass5\ProfilePage.xaml` — Profile UI
-- `Ass5\ProfilePage.xaml.cs` — UI logic (load/save/clear/change photo)
-- `Ass5\Models\Profile.cs` — Profile model
-- `Ass5\Services\ProfileStorage.cs` — Local storage (JSON + photo)
+- `Ass5/Services/SupabaseShoppingDataService.cs` - Supabase REST + local fallback data service
+- `Ass5/ViewModels/*` - MVVM view models for Profile, Shopping List, and Cart
+- `Ass5/ShoppingListPage.xaml` - landing page shopping UI
+- `Ass5/ShoppingCartPage.xaml` - cart UI
+- `Ass5/ProfilePage.xaml` - profile UI
+- `Ass5/AppShell.xaml` - tab navigation between Shop, Cart, Profile
 
-## How it works
+## Build
 
-### Data flow
-
-```mermaid
-flowchart TD
-  UI[ProfilePage UI\Entries\Editor\Image] -->|Save| Logic[ProfilePage.xaml.cs]
-  Logic -->|Serialize| Json[System.Text.Json]
-  Logic -->|SaveAsync| Storage[ProfileStorage]
-  Storage -->|Write| File[(AppDataDirectory\profile.json)]
-
-  UI -->|Change Photo| Logic
-  Logic -->|Capture\Pick| Media[MediaPicker]
-  Media -->|FileResult| Logic
-  Logic -->|SavePhotoAsync| Storage
-  Storage -->|Copy| Photo[(AppDataDirectory\profile-photo.*)]
-
-  Storage -->|LoadAsync| Logic
-  Logic -->|Populate UI| UI
-```
-
-### Storage locations
-
-- Profile JSON: `ProfileStorage.ProfileFilePath` (defaults to `<AppDataDirectory>\profile.json`)
-- Profile photo: `<AppDataDirectory>\profile-photo.<ext>`
-
-On each platform, `FileSystem.AppDataDirectory` maps to an app-private directory.
-
-## Build and run
-
-### Prerequisites
-
-- Visual Studio 2022 (latest) with **.NET MAUI** workload
-- .NET SDK **9.x** installed
-- For Android: Android SDK/emulator
-- For iOS/MacCatalyst: macOS tooling (Xcode) as required
-
-### Run
-
-- Open the solution in Visual Studio
-- Select a target (Android Emulator / Windows / iOS / MacCatalyst)
-- Build and run
-
-## Permissions
-
-Photo capture/pick may require permissions depending on platform:
-
-- Android: camera/photos permissions in `Ass5\Platforms\Android\AndroidManifest.xml`
-- iOS: usage descriptions in `Info.plist` (if included)
-
-If `MediaPicker` isn’t supported on a given device, the app shows a friendly status message.
-
-## UI overview
-
-### Screen layout
-
-```mermaid
-flowchart TB
-  Title[Welcome + subtitle]
-  Card[Profile Card
- Photo 
- Clear
- Name
- Surname 
- Email
- Bio
- Save
- Status]
-  Title --> Card
-```
-
+This project targets MAUI platforms and requires MAUI workloads (for example `maui-android`) installed in your environment.
