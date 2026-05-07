@@ -4,12 +4,22 @@
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:local="clr-namespace:Ass5"
-    Shell.NavBarIsVisible="False"
-    Title="Ass5">
+    Title="Shopping App">
 
-    <ShellContent
-        Title="Profile"
-        ContentTemplate="{DataTemplate local:ProfilePage}"
-        Route="ProfilePage" />
+    <TabBar>
+        <ShellContent
+            Title="Shop"
+            ContentTemplate="{DataTemplate local:ShoppingListPage}"
+            Route="ShoppingListPage" />
 
+        <ShellContent
+            Title="Cart"
+            ContentTemplate="{DataTemplate local:ShoppingCartPage}"
+            Route="ShoppingCartPage" />
+
+        <ShellContent
+            Title="Profile"
+            ContentTemplate="{DataTemplate local:ProfilePage}"
+            Route="ProfilePage" />
+    </TabBar>
 </Shell>

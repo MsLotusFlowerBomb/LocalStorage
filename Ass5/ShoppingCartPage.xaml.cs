@@ -3,14 +3,14 @@ using Ass5.ViewModels;
 
 namespace Ass5;
 
-public partial class ProfilePage : ContentPage
+public partial class ShoppingCartPage : ContentPage
 {
-    private readonly ProfileViewModel _viewModel;
+    private readonly ShoppingCartViewModel _viewModel;
 
-    public ProfilePage()
+    public ShoppingCartPage()
     {
         InitializeComponent();
-        _viewModel = ServiceHelper.GetService<ProfileViewModel>();
+        _viewModel = ServiceHelper.GetService<ShoppingCartViewModel>();
         BindingContext = _viewModel;
     }
 

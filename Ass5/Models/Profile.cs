@@ -1,13 +1,21 @@
+using System.Text.Json.Serialization;
+
 namespace Ass5.Models;
 
-
-//This class will be used to store and retrieve the profile information
 public sealed class Profile
 {
-    public string? Name { get; set; }
-    public string? Surname { get; set; }
-    public string? EmailAddress { get; set; }
-    public string? Bio { get; set; }
+    [JsonPropertyName("id")]
+    public int Id { get; set; }
 
-    public string? PhotoFileName { get; set; }
+    [JsonPropertyName("name")]
+    public string? Name { get; set; }
+
+    [JsonPropertyName("surname")]
+    public string? Surname { get; set; }
+
+    [JsonPropertyName("email_address")]
+    public string? EmailAddress { get; set; }
+
+    [JsonPropertyName("bio")]
+    public string? Bio { get; set; }
 }

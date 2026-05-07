@@ -1,25 +1,37 @@
-﻿using Microsoft.Extensions.Logging;
+using Ass5.Models;
+using Ass5.Services;
+using Ass5.ViewModels;
+using Microsoft.Extensions.Logging;
 
-namespace Ass5
+namespace Ass5;
+
+public static class MauiProgram
 {
-    public static class MauiProgram
+    public static MauiApp CreateMauiApp()
     {
-        public static MauiApp CreateMauiApp()
-        {
-            var builder = MauiApp.CreateBuilder();
-            builder
-                .UseMauiApp<App>()
-                .ConfigureFonts(fonts =>
-                {
-                    fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
-                    fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
-                });
+        var builder = MauiApp.CreateBuilder();
+        builder
+            .UseMauiApp<App>()
+            .ConfigureFonts(fonts =>
+            {
+                fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
+                fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
+            });
+
+        var supabaseOptions = SupabaseOptions.Load();
+
+        builder.Services.AddSingleton(supabaseOptions);
+        builder.Services.AddSingleton(new HttpClient());
+        builder.Services.AddSingleton<IShoppingDataService, SupabaseShoppingDataService>();
+
+        builder.Services.AddSingleton<ProfileViewModel>();
+        builder.Services.AddSingleton<ShoppingListViewModel>();
+        builder.Services.AddSingleton<ShoppingCartViewModel>();
 
 #if DEBUG
-    		builder.Logging.AddDebug();
+        builder.Logging.AddDebug();
 #endif
 
-            return builder.Build();
-        }
+        return builder.Build();
     }
 }

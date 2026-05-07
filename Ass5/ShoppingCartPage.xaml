@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="Ass5.ShoppingCartPage"
+             x:Name="ShoppingCartRoot"
+             Title="Shopping Cart">
+    <Grid RowDefinitions="Auto,*,Auto,Auto" Padding="16">
+        <Label Grid.Row="0" Text="Shopping Cart" FontSize="28" FontAttributes="Bold" />
+
+        <CollectionView Grid.Row="1" Margin="0,10,0,0" ItemsSource="{Binding CartItems}">
+            <CollectionView.EmptyView>
+                <Label Text="Your shopping cart is empty." />
+            </CollectionView.EmptyView>
+            <CollectionView.ItemTemplate>
+                <DataTemplate>
+                    <Frame Margin="0,0,0,10" Padding="10">
+                        <Grid ColumnDefinitions="*,Auto">
+                            <VerticalStackLayout>
+                                <Label Text="{Binding ItemName}" FontAttributes="Bold" />
+                                <Label Text="{Binding Quantity, StringFormat='Quantity: {0}'}" FontSize="12" />
+                                <Label Text="{Binding Total, StringFormat='Total: ${0:F2}'}" FontSize="12" />
+                            </VerticalStackLayout>
+                            <Button Grid.Column="1"
+                                    Text="Remove"
+                                    Command="{Binding Source={x:Reference ShoppingCartRoot}, Path=BindingContext.RemoveItemCommand}"
+                                    CommandParameter="{Binding .}" />
+                        </Grid>
+                    </Frame>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+
+        <Label Grid.Row="2" Text="{Binding CartTotal, StringFormat='Cart Total: ${0:F2}'}" FontAttributes="Bold" />
+        <Label Grid.Row="3" Text="{Binding StatusMessage}" FontSize="12" />
+    </Grid>
+</ContentPage>
