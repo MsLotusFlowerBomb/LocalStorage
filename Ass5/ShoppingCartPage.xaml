@@ -18,7 +18,7 @@
                             <VerticalStackLayout>
                                 <Label Text="{Binding ItemName}" FontAttributes="Bold" />
                                 <Label Text="{Binding Quantity, StringFormat='Quantity: {0}'}" FontSize="12" />
-                                <Label Text="{Binding Total, StringFormat='Total: ${0:F2}'}" FontSize="12" />
+                                <Label Text="{Binding Total, StringFormat='Total: R{0:F2}'}" FontSize="12" />
                             </VerticalStackLayout>
                             <Button Grid.Column="1"
                                     Text="Remove"
@@ -30,7 +30,7 @@
             </CollectionView.ItemTemplate>
         </CollectionView>
 
-        <Label Grid.Row="2" Text="{Binding CartTotal, StringFormat='Cart Total: ${0:F2}'}" FontAttributes="Bold" />
+        <Label Grid.Row="2" Text="{Binding CartTotal, StringFormat='Cart Total: R{0:F2}'}" FontAttributes="Bold" />
         <Label Grid.Row="3" Text="{Binding StatusMessage}" FontSize="12" />
     </Grid>
 </ContentPage>

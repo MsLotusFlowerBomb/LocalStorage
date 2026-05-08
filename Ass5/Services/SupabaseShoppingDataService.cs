@@ -2,6 +2,7 @@ using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
 using Ass5.Models;
+using Supabase; 
 
 namespace Ass5.Services;
 
@@ -14,7 +15,7 @@ public sealed class SupabaseShoppingDataService : IShoppingDataService
     private static readonly JsonSerializerOptions JsonOptions = new(JsonSerializerDefaults.Web);
 
     private readonly HttpClient _httpClient;
-    private readonly SupabaseOptions _options;
+    private readonly Models.SupabaseOptions _options;
 
     private readonly List<ShoppingItem> _localItems =
     [
@@ -28,7 +29,7 @@ public sealed class SupabaseShoppingDataService : IShoppingDataService
     private readonly List<ShoppingCartItem> _localCartItems = [];
     private readonly Profile _localProfile = new() { Id = 1 };
 
-    public SupabaseShoppingDataService(HttpClient httpClient, SupabaseOptions options)
+    public SupabaseShoppingDataService(HttpClient httpClient, Models.SupabaseOptions options)
     {
         _httpClient = httpClient;
         _options = options;
@@ -43,25 +44,71 @@ public sealed class SupabaseShoppingDataService : IShoppingDataService
         }
     }
 
+    public async Task<bool> CheckConnectionAsync(CancellationToken cancellationToken = default)
+    {
+        if (!_options.IsConfigured)
+            return false;
+
+        try
+        {
+            using var response = await _httpClient.GetAsync($"{ItemsTable}?select=id&limit=1", cancellationToken);
+            response.EnsureSuccessStatusCode();
+            return true;
+        }
+        catch
+        {
+            return false;
+        }
+    }
+
     public async Task InitializeAsync(CancellationToken cancellationToken = default)
     {
         if (!_options.IsConfigured)
             return;
 
-        var items = await GetAsync<List<ShoppingItem>>($"{ItemsTable}?select=*", cancellationToken) ?? [];
-        if (items.Count > 0)
+        // Confirm Supabase is reachable before attempting seeding.
+        if (!await CheckConnectionAsync(cancellationToken))
             return;
 
-        var payload = JsonSerializer.Serialize(_localItems, JsonOptions);
-        using var content = new StringContent(payload, Encoding.UTF8, "application/json");
-        using var request = new HttpRequestMessage(HttpMethod.Post, ItemsTable)
-        {
-            Content = content
-        };
-        request.Headers.Add("Prefer", "return=minimal");
+        var items = await GetAsync<List<ShoppingItem>>($"{ItemsTable}?select=*", cancellationToken) ?? [];
 
-        using var response = await _httpClient.SendAsync(request, cancellationToken);
-        response.EnsureSuccessStatusCode();
+        if (items.Count == 0)
+        {
+            var payload = JsonSerializer.Serialize(_localItems, JsonOptions);
+            using var content = new StringContent(payload, Encoding.UTF8, "application/json");
+            using var request = new HttpRequestMessage(HttpMethod.Post, ItemsTable)
+            {
+                Content = content
+            };
+            request.Headers.Add("Prefer", "return=minimal");
+
+            using var response = await _httpClient.SendAsync(request, cancellationToken);
+            response.EnsureSuccessStatusCode();
+        }
+
+        var existingProfiles = await GetAsync<List<Profile>>($"{ProfilesTable}?select=id&limit=1", cancellationToken) ?? [];
+        if (existingProfiles.Count == 0)
+        {
+            _ = await CreateProfileAsync(new Profile
+            {
+                Name = "Test",
+                Surname = "User",
+                EmailAddress = "test.user@example.com",
+                Bio = "Seeded profile from MAUI app"
+            }, cancellationToken);
+        }
+
+        var profile = await GetOrCreateProfileAsync(cancellationToken);
+        var existingCart = await GetAsync<List<ShoppingCartItem>>($"{CartTable}?select=id&profile_id=eq.{profile.Id}&limit=1", cancellationToken) ?? [];
+        if (existingCart.Count == 0)
+        {
+            var seedItems = await GetShoppingItemsAsync(cancellationToken);
+            var firstItem = seedItems.FirstOrDefault();
+            if (firstItem is not null)
+            {
+                _ = await AddToCartAsync(profile.Id, firstItem.Id, 1, cancellationToken);
+            }
+        }
     }
 
     public async Task<Profile> GetOrCreateProfileAsync(CancellationToken cancellationToken = default)
@@ -171,13 +218,13 @@ public sealed class SupabaseShoppingDataService : IShoppingDataService
             if (item is null)
                 return false;
 
-            var existing = _localCartItems.FirstOrDefault(c => c.ProfileId == profileId && c.ShoppingItemId == shoppingItemId);
-            var existingQty = existing?.Quantity ?? 0;
-            if (existingQty + quantity > item.StockQuantity)
+            var localExisting = _localCartItems.FirstOrDefault(c => c.ProfileId == profileId && c.ShoppingItemId == shoppingItemId);
+            var localExistingQty = localExisting?.Quantity ?? 0;
+            if (localExistingQty + quantity > item.StockQuantity)
                 return false;
 
-            if (existing is null)
-            {
+            if (localExisting is null)
+            { 
                 _localCartItems.Add(new ShoppingCartItem
                 {
                     Id = _localCartItems.Count == 0 ? 1 : _localCartItems.Max(c => c.Id) + 1,
@@ -188,7 +235,7 @@ public sealed class SupabaseShoppingDataService : IShoppingDataService
             }
             else
             {
-                existing.Quantity += quantity;
+                localExisting.Quantity += quantity;
             }
 
             return true;

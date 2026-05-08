@@ -41,6 +41,13 @@
 		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'tizen'">6.5</SupportedOSPlatformVersion>
 	</PropertyGroup>
 
+	<PropertyGroup Condition="'$(RunConfiguration)'=='Default'">
+	  <EnvironmentVariables>
+			<Variable name=" SUPABASE_URL" value="https://nnrdetltgqwwzrougctr.supabase.co" />
+			<Variable name="SUPABASE_ANON_KEY" value="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5ucmRldGx0Z3F3d3pyb3VnY3RyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgxNjU2NDMsImV4cCI6MjA5Mzc0MTY0M30.DqXq8Dn_ohwRkcUaVRsl8J2EAOibYE9xcHkO83RBkps" />
+		</EnvironmentVariables>
+	</PropertyGroup>
+
 	<ItemGroup>
 		<!-- App Icon -->
 		<MauiIcon Include="Resources\AppIcon\appicon.svg" ForegroundFile="Resources\AppIcon\hka.svg" Color="white" />
@@ -65,8 +72,12 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.2" />
+		<PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="10.0.7" />
+		<PackageReference Include="Microsoft.Extensions.Http" Version="10.0.7" />
 		<PackageReference Include="Microsoft.Maui.Controls" Version="$(MauiVersion)" />
 		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="9.0.9" />
+		<PackageReference Include="Supabase" Version="1.1.1" />
 	</ItemGroup>
 
 	<ItemGroup>

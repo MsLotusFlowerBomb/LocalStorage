@@ -1,19 +1,21 @@
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
 
 namespace Ass5.Models;
 
-public sealed class ShoppingCartItem
+[Table("Shopping_cart_items")]
+public class ShoppingCartItem
 {
-    [JsonPropertyName("id")]
+    [Column("id")]
     public int Id { get; set; }
 
-    [JsonPropertyName("profile_id")]
+    [Column("profile_id")]
     public int ProfileId { get; set; }
 
-    [JsonPropertyName("shopping_item_id")]
+    [Column("shopping_item_id")]
     public int ShoppingItemId { get; set; }
 
-    [JsonPropertyName("quantity")]
+    [Column("quantity")]
     public int Quantity { get; set; }
 
     [JsonIgnore]

@@ -1,21 +1,24 @@
+using Supabase.Postgrest.Models;
 using System.Text.Json.Serialization;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Ass5.Models;
 
-public sealed class Profile
+[Table("profiles")]
+public class Profile: BaseModel
 {
-    [JsonPropertyName("id")]
+    [Column("id")]
     public int Id { get; set; }
 
-    [JsonPropertyName("name")]
+    [Column("name")]
     public string? Name { get; set; }
 
-    [JsonPropertyName("surname")]
+    [Column("surname")]
     public string? Surname { get; set; }
 
-    [JsonPropertyName("email_address")]
+    [Column("email_address")]
     public string? EmailAddress { get; set; }
 
-    [JsonPropertyName("bio")]
+    [Column("bio")]
     public string? Bio { get; set; }
 }
